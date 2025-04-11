@@ -36,7 +36,7 @@ class EarthViewer:
     }
 
     def __init__(self):
-        self.earth = EarthAPI()
+        self.earth = EarthAPI(**{"version":"1.16"})
         self.cameras = []
         self.root = self._create_ui()
         
@@ -102,7 +102,8 @@ class EarthViewer:
 
     def play_flight(self):
         for camera in self.cameras:
-            flight = self._create_drawing('flight', {'camera': camera})
+            flight = self.BASE_TEMPLATES['flight'].copy() 
+            flight['camera'] = camera
             self.earth.set_flight(flight)
             time.sleep(self.DEFAULT_DURATION)
 
