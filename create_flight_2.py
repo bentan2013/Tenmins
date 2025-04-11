@@ -43,31 +43,76 @@ class EarthViewer:
     def _create_ui(self):
         root = tk.Tk()
         root.title("Earth Flight Control")
-        root.geometry("300x220")  # 增加高度
-        
-        # 新增相机控制行
+        root.geometry("300x300")  # 调整窗口高度
+
+        # 相机控制行
         control_frame = tk.Frame(root)
-        control_frame.pack(pady=10)
-        
+        control_frame.pack(pady=5)
+        # ... 原有的roll控件 ...
         tk.Label(control_frame, text="Roll:").pack(side=tk.LEFT)
         self.roll_entry = tk.Entry(control_frame, width=8)
         self.roll_entry.pack(side=tk.LEFT, padx=5)
         
         set_btn = tk.Button(control_frame, text="Set Camera", command=self.set_camera)
         set_btn.pack(side=tk.LEFT)
+
+
+        # 功能按钮区域
+        btn_frame = tk.Frame(root)
+        btn_frame.pack(pady=5)
         
-        # 原有功能按钮
-        controls = [
+        main_controls = [
             ("Save Camera", self.save_camera),
+            ("Save Flight", self.save_flight),
             ("Play Flight", self.play_flight),
-            ("Display Path", self.display_path)
+            ("Display Flight", self.display_path)
         ]
         
-        for text, command in controls:
-            btn = tk.Button(root, text=text, command=command)
-            btn.pack(pady=5)
-            
+        for text, command in main_controls:
+            btn = tk.Button(btn_frame, text=text, command=command)
+            btn.pack(pady=2, fill=tk.X)
+
+        # 加载飞行路径控件
+        load_frame = tk.Frame(root)
+        load_frame.pack(pady=5)
+        
+        self.load_entry = tk.Entry(load_frame, width=20)
+        self.load_entry.pack(side=tk.LEFT, padx=5)
+        
+        load_btn = tk.Button(load_frame, text="Load Flight", command=self.load_flight)
+        load_btn.pack(side=tk.LEFT)
+
         return root
+
+    def save_flight(self):
+        if not self.cameras:
+            messagebox.showwarning("Warning", "No camera data to save!")
+            return
+
+        filename = f"flight_{uuid.uuid4().hex[:8]}.json"
+        try:
+            with open(filename, 'w') as f:
+                json.dump(self.cameras, f, indent=2)
+            messagebox.showinfo("Saved", f"Flight path saved to:\n{filename}")
+        except Exception as e:
+            messagebox.showerror("Error", f"Save failed: {str(e)}")
+
+    def load_flight(self):
+        filename = self.load_entry.get().strip()
+        if not filename:
+            messagebox.showwarning("Warning", "Please enter a filename")
+            return
+
+        try:
+            with open(filename, 'r') as f:
+                self.cameras = json.load(f)
+            messagebox.showinfo("Loaded", f"Successfully loaded {len(self.cameras)} cameras")
+        except FileNotFoundError:
+            messagebox.showerror("Error", f"File not found: {filename}")
+        except json.JSONDecodeError:
+            messagebox.showerror("Error", "Invalid JSON format")
+        except Exception as e:
+            messagebox.showerror("Error", f"Load failed: {str(e)}")
 
     def set_camera(self):
         try:
