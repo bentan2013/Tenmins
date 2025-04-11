@@ -2,9 +2,13 @@ import time
 import tkinter as tk
 from copy import deepcopy
 from earth_api import EarthAPI
+import uuid
+import json
+from tkinter import messagebox
+
 
 class EarthViewer:
-    DEFAULT_DURATION = 2
+    DEFAULT_DURATION = 1
     BASE_TEMPLATES = {
         'flight': {
             "camera": None,

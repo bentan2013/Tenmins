@@ -127,3 +127,5 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+flight_4ae3f491.json
+*.json
